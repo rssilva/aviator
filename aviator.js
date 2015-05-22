@@ -71,6 +71,16 @@ var isArray = function (o) {
 };
 
 /**
+@method isFunc
+@param {any} val
+@return {Boolean}
+@private
+**/
+var isFunc = function (val) {
+  return typeof val === 'function';
+};
+
+/**
 @method isPlainObject
 @param {any} val
 @return {Boolean}
@@ -96,6 +106,7 @@ module.exports = {
   merge: merge,
   addEvent: addEvent,
   isArray: isArray,
+  isFunc: isFunc,
   isPlainObject: isPlainObject,
   isString: isString
 };
@@ -776,6 +787,7 @@ module.exports = Request;
 },{"./helpers":1}],5:[function(require,module,exports){
 var helpers = require('./helpers'),
     merge = helpers.merge,
+    isFunc = helpers.isFunc,
     isString = helpers.isString,
     isPlainObject = helpers.isPlainObject;
 
@@ -794,6 +806,7 @@ var Route = function (routes, uri) {
   this.actions      = [];
   this.exits        = [];
   this.options      = {};
+  this.anonymous    = {};
   this.notFound     = null;
   this.fullMatch    = false;
 
@@ -840,16 +853,16 @@ Route.prototype = {
         target: target,
         method: routeLevel.notFound
       };
+    } else if (isFunc(routeLevel.notFound)) {
+      this.notFound = this.anonymousAction(routeLevel.notFound);
     }
-
-
-    action = {
-      target: target,
-      method: null
-    };
 
     for (var key in routeLevel) {
       if (routeLevel.hasOwnProperty(key)) {
+        action = {
+          target: target,
+          method: null
+        };
         value = routeLevel[key];
 
         if (this.isFragment(key) && this.isFragmentInURI(key)) {
@@ -863,6 +876,9 @@ Route.prototype = {
             if (!this.isNamedParam(key) || !action.method) {
               if (isString(value)) {
                 action.method = value;
+              }
+              else if (isFunc(value)) {
+                action = this.anonymousAction(value);
               }
               else {
                 action.method = value.method;
@@ -1018,7 +1034,7 @@ Route.prototype = {
   @return {Boolean}
   **/
   isActionDescriptor: function (val) {
-    return isString(val) || isPlainObject(val) && val.method;
+    return isString(val) || isFunc(val) || isPlainObject(val) && val.method;
   },
 
   /**
@@ -1028,6 +1044,23 @@ Route.prototype = {
   **/
   isNamedParam: function (fragment) {
     return fragment.indexOf('/:') === 0;
+  },
+
+  /**
+  Assign the given function to the next sequential key in the this.anonymous
+  object.
+
+  @method generateNotFoundAction
+  @param {Function} func the anonymous function to transform into an action.
+  @return {Object} With a method key that maps to a generated String, and
+  **/
+  anonymousAction: function (func) {
+    var method = 'FUNCTION-' + Object.keys(this.anonymous).length;
+    this.anonymous[method] = func;
+    return {
+      target: this.anonymous,
+      method: method
+    };
   }
 };
 
