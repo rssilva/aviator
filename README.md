@@ -146,6 +146,9 @@ Aviator.setRoutes({
 Upon hitting `"/users/"`, `usersTarget#beforeAll` and the anonymous function
 above will be called in that order.
 
+We encourage the use of targets over anonymous functions, but we provide this as
+an option in case it fits your stylistic needs.
+
 #### Not Found Handlers
 
 Aviator allows you to specify a method to be called when no route matches via
