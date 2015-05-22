@@ -129,6 +129,22 @@ Upon hitting `"/marketing/reputation"`,
 `marketingTarget#show` and `reputationTarget#show`
 will be called in that order, and both will be passed the options object.
 
+Finally, route handlers may also be specified as plain functions:
+
+```javascript
+Aviator.setRoutes({
+  '/users': {
+    target: UsersTarget,
+    '/*': 'beforeAll',
+    '/': function () {
+      // Handle the route here
+    }
+  }
+});
+```
+
+Upon hitting `"/users/"`, `usersTarget#beforeAll` and the anonymous function
+above will be called in that order.
 
 #### Not Found Handlers
 
@@ -156,6 +172,8 @@ Hitting either `/marketing/bad-route/` or `/marketing/reputation/bad-route/`
 will call the `MarketingTarget.show` and `MarketingTarget.notFound` methods.
 However, hitting `/bad-route/` will call nothing unless a `notFound` matcher
 is found in the root context.
+
+Not found handlers may also be specified using plain functions.
 
 #### namedParams
 
