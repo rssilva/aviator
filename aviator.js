@@ -806,7 +806,6 @@ var Route = function (routes, uri) {
   this.actions      = [];
   this.exits        = [];
   this.options      = {};
-  this.anonymous    = {};
   this.notFound     = null;
   this.fullMatch    = false;
 
@@ -853,7 +852,8 @@ Route.prototype = {
         target: target,
         method: routeLevel.notFound
       };
-    } else if (isFunc(routeLevel.notFound)) {
+    }
+    else if (isFunc(routeLevel.notFound)) {
       this.notFound = this.anonymousAction(routeLevel.notFound);
     }
 
@@ -1047,19 +1047,16 @@ Route.prototype = {
   },
 
   /**
-  Assign the given function to the next sequential key in the this.anonymous
-  object.
+  Create an action Object from the given function.
 
-  @method generateNotFoundAction
+  @method anonymousAction
   @param {Function} func the anonymous function to transform into an action.
   @return {Object} With a method key that maps to a generated String, and
   **/
   anonymousAction: function (func) {
-    var method = 'FUNCTION-' + Object.keys(this.anonymous).length;
-    this.anonymous[method] = func;
     return {
-      target: this.anonymous,
-      method: method
+      target: { lambda: func },
+      method: 'lambda'
     };
   }
 };
