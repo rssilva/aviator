@@ -66,7 +66,8 @@ Route.prototype = {
         target: target,
         method: routeLevel.notFound
       };
-    } else if (isFunc(routeLevel.notFound)) {
+    }
+    else if (isFunc(routeLevel.notFound)) {
       this.notFound = this.anonymousAction(routeLevel.notFound);
     }
 
