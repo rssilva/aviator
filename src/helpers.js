@@ -70,6 +70,16 @@ var isArray = function (o) {
 };
 
 /**
+@method isFunc
+@param {any} val
+@return {Boolean}
+@private
+**/
+var isFunc = function (val) {
+  return typeof val === 'function';
+};
+
+/**
 @method isPlainObject
 @param {any} val
 @return {Boolean}
@@ -95,6 +105,7 @@ module.exports = {
   merge: merge,
   addEvent: addEvent,
   isArray: isArray,
+  isFunc: isFunc,
   isPlainObject: isPlainObject,
   isString: isString
 };
